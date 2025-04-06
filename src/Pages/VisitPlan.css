@@ -1,0 +1,73 @@
+/* src/pages/VisitPlan.css */
+.visit-plan-container {
+  padding: 20px;
+  background-color: #f4f4f9;
+}
+
+h1 {
+  text-align: center;
+  font-size: 2rem;
+}
+
+.visit-plan-list {
+  margin-top: 30px;
+}
+
+.visit-plan-list h2 {
+  font-size: 1.5rem;
+}
+
+.visit-plan-item {
+  display: flex;
+  justify-content: space-between;
+  background-color: #ffffff;
+  border-radius: 5px;
+  padding: 10px;
+  margin: 10px 0;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.plan-details {
+  display: flex;
+  justify-content: space-between;
+  width: 80%;
+}
+
+.visit-plan-item button {
+  background-color: #ff5c5c;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.visit-plan-item button:hover {
+  background-color: #ff3333;
+}
+
+.add-visit-plan {
+  margin-top: 30px;
+  text-align: center;
+}
+
+.add-visit-plan input {
+  padding: 10px;
+  width: 250px;
+  margin-right: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.add-visit-plan button {
+  padding: 10px 20px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.add-visit-plan button:hover {
+  background-color: #45a049;
+}

@@ -1,0 +1,35 @@
+.customer-management {
+  padding: 20px;
+  max-width: 1000px;
+  margin: auto;
+}
+
+.customer-form {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.customer-form input,
+.customer-form select,
+.customer-form button {
+  padding: 10px;
+  font-size: 14px;
+}
+
+.customer-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.customer-table th,
+.customer-table td {
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: left;
+}
+
+.customer-table th {
+  background-color: #f2f2f2;
+}

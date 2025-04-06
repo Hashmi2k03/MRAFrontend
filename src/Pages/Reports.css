@@ -1,0 +1,40 @@
+.reports-page {
+  padding: 20px;
+  max-width: 1000px;
+  margin: auto;
+}
+
+.report-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 20px;
+  align-items: center;
+}
+
+.report-controls select,
+.report-controls button {
+  padding: 8px 12px;
+  font-size: 14px;
+}
+
+.export-buttons button {
+  margin-right: 10px;
+}
+
+.report-table table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+.report-table th,
+.report-table td {
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: left;
+}
+
+.report-table th {
+  background-color: #f9f9f9;
+}
