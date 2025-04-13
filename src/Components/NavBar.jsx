@@ -16,6 +16,9 @@ const Navbar = () => {
         <Link to="/visit-plan" className="navbar-link">Visit Plan</Link>
         <Link to="/customer-management" className="navbar-link">Customer Management</Link>
         <Link to="/reports" className="navbar-link">Reports</Link>
+        <Link to="/AdminDash" className="navbar-link">Organization </Link>
+
+
       </div>
     </nav>
   );
