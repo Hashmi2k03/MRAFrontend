@@ -1,32 +1,74 @@
 import React, { useState, useEffect } from "react";
-import './LoginSignup.css';
+import { useNavigate } from "react-router-dom"; 
+import "./LoginSignup.css";
+import axios from "axios";
 
 const LoginSignup = () => {
   const [action, setAction] = useState("Login");
   const [orgOptions, setOrgOptions] = useState([]);
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-    phone: "",
-    address: "",
-    organization: "",
-  });
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [phone, setPhone] = useState('');
+  const [address, setAddress] = useState('');
+  const [organization, setOrganization] = useState('');
+  const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
+
+  const navigate = useNavigate(); 
 
   useEffect(() => {
+    // Simulate fetching orgs from API
     setTimeout(() => {
       setOrgOptions(["Company A", "Company B", "Company C"]);
     }, 500);
   }, []);
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Form submit logic goes here (this is just UI-related code)
+    setError('');
+    setMessage('');
+
+    if (action === 'Signup' && password !== confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+
+    const endpoint =
+      action === 'Login'
+        ? 'http://localhost:3000/api/users/login'
+        : 'http://localhost:3000/api/users/';
+
+    const payload =
+      action === 'Login'
+        ? { email, password }
+        : { name, email, password, phone, address, organization };
+
+    try {
+      const res = await axios.post(endpoint, payload);
+      console.log(`${action} successful:`, res.data);
+
+      if (action === 'Login') {
+        setMessage('Login successful!');
+        // localStorage.setItem('token', res.data.token);
+        navigate('/dashboard');
+      } else {
+        setMessage('Registration successful! You can now log in.');
+        setAction('Login');
+        // Optionally clear form
+        setName('');
+        setEmail('');
+        setPassword('');
+        setConfirmPassword('');
+        setPhone('');
+        setAddress('');
+        setOrganization('');
+      }
+    } catch (err) {
+      console.error(`${action} failed:`, err);
+      setError(err.response?.data?.message || 'Something went wrong.');
+    }
   };
 
   return (
@@ -54,47 +96,51 @@ const LoginSignup = () => {
             <>
               <input
                 type="text"
-                name="name"
                 placeholder="Name"
-                onChange={handleChange}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
                 required
               />
               <input
                 type="email"
-                name="email"
                 placeholder="Email"
-                onChange={handleChange}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
               />
               <input
                 type="password"
-                name="password"
                 placeholder="Password"
-                onChange={handleChange}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 required
               />
               <input
                 type="password"
-                name="confirmPassword"
                 placeholder="Enter Password Again"
-                onChange={handleChange}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
                 required
               />
               <input
                 type="text"
-                name="phone"
                 placeholder="Phone Number"
-                onChange={handleChange}
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
                 required
               />
               <input
                 type="text"
-                name="address"
                 placeholder="Address"
-                onChange={handleChange}
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
                 required
               />
-              <select name="organization" onChange={handleChange} required>
+              <select
+                value={organization}
+                onChange={(e) => setOrganization(e.target.value)}
+                required
+              >
                 <option value="">Select Organization</option>
                 {orgOptions.map((org, index) => (
                   <option key={index} value={org}>
@@ -109,16 +155,16 @@ const LoginSignup = () => {
             <>
               <input
                 type="email"
-                name="email"
                 placeholder="Email"
-                onChange={handleChange}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
               />
               <input
                 type="password"
-                name="password"
                 placeholder="Password"
-                onChange={handleChange}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 required
               />
             </>
@@ -127,6 +173,9 @@ const LoginSignup = () => {
           <button type="submit" className="submit-btn">
             {action}
           </button>
+
+          {error && <p className="error">{error}</p>}
+          {message && <p className="success">{message}</p>}
         </form>
       </div>
     </div>
