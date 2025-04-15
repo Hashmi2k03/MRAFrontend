@@ -1,15 +1,38 @@
-// src/pages/Dashboard.jsx
-import React from "react";
-import "./Dashboard.css"; // You can style the dashboard using CSS
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import "./Dashboard.css";
 
 const Dashboard = () => {
-  // Dummy data for the dashboard
-  const data = {
-    totalVisits: 120,
-    territories: 15,
-    customers: 250,
-    salesManagers: 5,
-  };
+  const [data, setData] = useState({
+    totalVisits: 0,
+    territories: 0,
+    customers: 0,
+  });
+  const [customers, setCustomers] = useState([]);
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        const [territoriesRes, customersRes] = await Promise.all([
+          axios.get("https://mrappbackend.onrender.com/api/territories/count"),
+          axios.get("https://mrappbackend.onrender.com/api/povs/count"),
+        ]);
+
+        setData({
+          totalVisits: 0,
+          territories: territoriesRes.data.count || 0,
+          customers: customersRes.data.count || 0,
+        });
+
+        const customersList = await axios.get("https://mrappbackend.onrender.com/api/povs/");
+        setCustomers(customersList.data || []);
+      } catch (error) {
+        console.error("Failed to fetch dashboard data:", error);
+      }
+    };
+
+    fetchDashboardData();
+  }, []);
 
   return (
     <div className="dashboard-container">
@@ -27,17 +50,31 @@ const Dashboard = () => {
           <h2>Customers</h2>
           <p>{data.customers}</p>
         </div>
-        <div className="dashboard-card">
-          <h2>Sales Managers</h2>
-          <p>{data.salesManagers}</p>
-        </div>
       </div>
-      <div className="dashboard-chart">
-        {/* Add a chart or graphs here */}
-        <h2>Sales Performance Chart (Dummy Data)</h2>
-        <div className="chart-placeholder">
-          <p>Chart goes here</p>
-        </div>
+      <div className="dashboard-customers">
+        <h2>Customer List</h2>
+        {customers.length === 0 ? (
+          <p>No customers found.</p>
+        ) : (
+          <table className="customer-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Address</th>
+                <th>Number</th>
+              </tr>
+            </thead>
+            <tbody>
+              {customers.map((customer) => (
+                <tr key={customer.id}>
+                  <td>{customer.name}</td>
+                  <td>{customer.address}</td>
+                  <td>{customer.number}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
     </div>
   );

@@ -10,15 +10,13 @@ const Navbar = () => {
         <h2>Medical CRM</h2>
       </div>
       <div className="navbar-links">
-        <Link to="/LoginSignup" className="navbar-link">Login</Link>
+        <Link to="/LoginSignup" className="navbar-link">Logout</Link>
         <Link to="/dashboard" className="navbar-link">Dashboard</Link>
         <Link to="/territory" className="navbar-link">Territory</Link>
         <Link to="/visit-plan" className="navbar-link">Visit Plan</Link>
         <Link to="/customer-management" className="navbar-link">Customer Management</Link>
         <Link to="/reports" className="navbar-link">Reports</Link>
         <Link to="/AdminDash" className="navbar-link">Organization </Link>
-
-
       </div>
     </nav>
   );
