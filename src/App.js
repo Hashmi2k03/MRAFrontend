@@ -9,6 +9,7 @@ import CustomerManagement from "./Pages/CManagement";
 import Reports from "./Pages/Reports";
 import AdminDash from "./Pages/AdminDash";
 import TerEmp from "./Pages/TerEmp";
+import Pending from "./Pages/Pending";
 
 import "./App.css";
 
@@ -42,6 +43,7 @@ function AppRoutes() {
         <Route path="/reports" element={<Reports />} />
         <Route path="/AdminDash" element={<AdminDash />} />
         <Route path="/TerEmp" element={<TerEmp />} />
+        <Route path="/pending" element={<Pending />} />
       </Routes>
     </>
   );
