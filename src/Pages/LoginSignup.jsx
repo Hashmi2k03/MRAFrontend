@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, use } from "react";
 import { useNavigate } from "react-router-dom";
 import "./LoginSignup.css";
 import axios from "axios";
@@ -10,26 +10,26 @@ const LoginSignup = () => {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [phone, setPhone] = useState("");
+  const [number, setPhone] = useState("");
   const [address, setAddress] = useState("");
-  const [organization, setOrganization] = useState("");
+  const [organisation, setorganisation] = useState("");
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
-
-  const [signupType, setSignupType] = useState("Student");
-
+  const [userRole, setUserRole] = useState("admin");
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchOrgs = async () => {
       try {
-        const response = await axios.get("https://mrappbackend.onrender.com/api/org/");
-        setOrgOptions(response.data.map((org) => org.name)); // Assuming the API returns an array of organizations
+        const response = await axios.get(
+          "https://mrappbackend.onrender.com/api/org/"
+        );
+        setOrgOptions(response.data.map((org) => org.name)); // Assuming the API returns an array of organisations
       } catch (error) {
-        console.error("Error fetching organizations:", error);
+        console.error("Error fetching organisations:", error);
       }
     };
-  
+
     fetchOrgs();
   }, []);
 
@@ -45,17 +45,17 @@ const LoginSignup = () => {
 
     const endpoint =
       action === "Login"
-        ? "https://mrappbackend.onrender.com/api/users/login"
+        ? "http://localhost:3000/api/users/login"
         : action === "Signup User"
-        ? "https://mrappbackend.onrender.com/api/users/"
-        : "https://mrappbackend.onrender.com/api/org/";
+        ? "http://localhost:3000/api/users/"
+        : "http://localhost:3000/api/org/";
 
     const payload =
       action === "Login"
         ? { email, password }
         : action === "Signup User"
-        ? { name, email, password, phone, address, organization }
-        : { name, email, password, phone, address };
+        ? { name, email, password, number, address, organisation }
+        : { name, email, password, number, address };
 
     try {
       const res = await axios.post(endpoint, payload);
@@ -63,8 +63,20 @@ const LoginSignup = () => {
 
       if (action === "Login") {
         setMessage("Login successful!");
-        // localStorage.setItem('token', res.data.token);
-        navigate("/dashboard");
+        localStorage.setItem("userRole", res.data.role);
+        if (res.data.role === "admin") {
+          localStorage.setItem("organisation", res.data.name);
+        }
+        else {
+          localStorage.setItem("organisation", res.data.organisation);
+        }
+        console.log("organisation:", localStorage.getItem("organisation")); // for debugging
+        console.log("User Role:", res.data.role); // for debugging
+        if (res.data.role === "admin" || res.data.role === "user") {
+          navigate("/dashboard");
+        } else {
+          navigate("/Unauthorised");
+        }
       } else {
         setMessage("Registration successful! You can now log in.");
         setAction("Login");
@@ -75,7 +87,7 @@ const LoginSignup = () => {
         setConfirmPassword("");
         setPhone("");
         setAddress("");
-        setOrganization("");
+        setorganisation("");
       }
     } catch (err) {
       console.error(`${action} failed:`, err);
@@ -113,7 +125,7 @@ const LoginSignup = () => {
               className={action === "Signup Organisation" ? "active" : ""}
               onClick={() => setAction("Signup Organisation")}
             >
-              Signup Organization
+              Signup organisation
             </button>
           </div>
         )}
@@ -121,7 +133,6 @@ const LoginSignup = () => {
         <h2>{action}</h2>
 
         <form onSubmit={handleSubmit}>
-          
           {action === "Signup User" && (
             <>
               <input
@@ -155,7 +166,7 @@ const LoginSignup = () => {
               <input
                 type="text"
                 placeholder="Phone Number"
-                value={phone}
+                value={number}
                 onChange={(e) => setPhone(e.target.value)}
                 required
               />
@@ -167,11 +178,11 @@ const LoginSignup = () => {
                 required
               />
               <select
-                value={organization}
-                onChange={(e) => setOrganization(e.target.value)}
+                value={organisation}
+                onChange={(e) => setorganisation(e.target.value)}
                 required
               >
-                <option value="">Select Organization</option>
+                <option value="">Select organisation</option>
                 {orgOptions.map((org, index) => (
                   <option key={index} value={org}>
                     {org}
@@ -214,7 +225,7 @@ const LoginSignup = () => {
               <input
                 type="text"
                 placeholder="Phone Number"
-                value={phone}
+                value={number}
                 onChange={(e) => setPhone(e.target.value)}
                 required
               />

@@ -1,53 +1,60 @@
 import React, { useEffect, useState } from "react";
 import "./pending.css";
+import axios from "axios";
 
 const Pending = () => {
   const [pendingEmployees, setPendingEmployees] = useState([]);
-  const [roleUpdates, setRoleUpdates] = useState({}); // track role updates by ID
+  const [roleUpdates, setRoleUpdates] = useState({});
 
-  // Simulated API call with mock data
   useEffect(() => {
-    setTimeout(() => {
-      const mockData = [
-        {
-          _id: "1",
-          name: "John Doe",
-          email: "john@example.com",
-          organization: "Company A",
-          role: "Medical Rep"
-        },
-        {
-          _id: "2",
-          name: "Jane Smith",
-          email: "jane@example.com",
-          organization: "Company A",
-          role: "Medical Rep"
-        }
-      ];
-      setPendingEmployees(mockData);
+    const fetchPendingEmployees = async () => {
+      try {
+        const response = await axios.get("http://localhost:3000/api/users");
+        const data = response.data;
+        setPendingEmployees(data);
 
-      // Initialize roleUpdates with current roles
-      const initialRoles = {};
-      mockData.forEach((emp) => {
-        initialRoles[emp._id] = emp.role;
-      });
-      setRoleUpdates(initialRoles);
-    }, 500);
+        const initialRoles = {};
+        data.forEach((emp) => {
+          initialRoles[emp._id] = emp.role;
+        });
+        setRoleUpdates(initialRoles);
+      } catch (error) {
+        console.error("Error fetching pending employees:", error);
+      }
+    };
+
+    fetchPendingEmployees();
   }, []);
 
   const handleRoleChange = (id, newRole) => {
     setRoleUpdates((prev) => ({ ...prev, [id]: newRole }));
   };
 
-  const handleApprove = (id) => {
-    const selectedRole = roleUpdates[id] || "Medical Rep";
-    alert(`Approved employee ID: ${id} with role: ${selectedRole}`);
-    setPendingEmployees((prev) => prev.filter((emp) => emp._id !== id));
+  const handleApprove = async (id) => {
+    const selectedRole = roleUpdates[id] || "user";
+
+    try {
+      await axios.put(`http://localhost:3000/api/users/${id}`, {
+        role: selectedRole,
+        status: "approved",
+      });
+
+      alert(`Approved employee ID: ${id} with role: ${selectedRole}`);
+    } catch (error) {
+      console.error("Error approving employee:", error);
+      alert("Failed to approve employee. Please try again.");
+    }
   };
 
-  const handleReject = (id) => {
-    alert(`Rejected employee ID: ${id}`);
-    setPendingEmployees((prev) => prev.filter((emp) => emp._id !== id));
+  const handleReject = async (id) => {
+    try {
+      await axios.delete(`http://localhost:3000/api/users/${id}`);
+      alert(`Rejected and deleted employee ID: ${id}`);
+      setPendingEmployees((prev) => prev.filter((emp) => emp._id !== id));
+    } catch (error) {
+      console.error("Error rejecting/deleting employee:", error);
+      alert("Failed to reject employee. Please try again.");
+    }
   };
 
   return (
@@ -62,7 +69,7 @@ const Pending = () => {
             <tr>
               <th>Name</th>
               <th>Email</th>
-              <th>Organization</th>
+              <th>Organisation</th>
               <th>Role</th>
               <th>Actions</th>
             </tr>
@@ -72,21 +79,38 @@ const Pending = () => {
               <tr key={emp._id}>
                 <td>{emp.name}</td>
                 <td>{emp.email}</td>
-                <td>{emp.organization}</td>
+                <td>{emp.organisation}</td>
                 <td>
-                  <select
-                    value={roleUpdates[emp._id] || emp.role}
-                    onChange={(e) => handleRoleChange(emp._id, e.target.value)}
-                  >
-                    <option value="Medical Rep">Medical Rep</option>
-                    <option value="Sales Rep">Sales Rep</option>
-                    <option value="Team Lead">Team Lead</option>
-                    <option value="Manager">Manager</option>
-                  </select>
+                  {emp.role ? (
+                    <span>
+                      {emp.role === "user" ? "Medical Rep" : "Manager"}
+                    </span>
+                  ) : (
+                    <select
+                      value={roleUpdates[emp._id] || ""}
+                      onChange={(e) =>
+                        handleRoleChange(emp._id, e.target.value)
+                      }
+                    >
+                      <option value="">Select Role</option>
+                      <option value="user">Medical Rep</option>
+                      <option value="manager">Manager</option>
+                    </select>
+                  )}
                 </td>
                 <td>
-                  <button onClick={() => handleApprove(emp._id)}>Approve</button>
-                  <button onClick={() => handleReject(emp._id)}>Reject</button>
+                  {emp.role ? (
+                    <span className="approved-label">Approved</span>
+                  ) : (
+                    <>
+                      <button onClick={() => handleApprove(emp._id)}>
+                        Approve
+                      </button>
+                      <button onClick={() => handleReject(emp._id)}>
+                        Reject
+                      </button>
+                    </>
+                  )}
                 </td>
               </tr>
             ))}

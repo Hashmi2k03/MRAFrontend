@@ -6,23 +6,45 @@ const CustomerManagement = () => {
   const [customers, setCustomers] = useState([]);
   const [newCustomer, setNewCustomer] = useState({
     name: "",
-    type: "",
-    contact: "",
+    povType: "",
+    number: "",
     address: "",
+    contactPerson: "",
+    organisation: localStorage.getItem("organization"),
   });
+  const [territories, setTerritories] = useState([]); // State to hold territories
 
   // Fetch customers from the API when the component mounts
   useEffect(() => {
     fetchCustomers();
+    fetchTerritories(); // Fetch territories when the component mounts
   }, []);
 
   // Fetch all customers
   const fetchCustomers = async () => {
     try {
-      const response = await axios.get("https://mrappbackend.onrender.com/api/povs/count");
+      const organisation = localStorage.getItem("organization");
+      const response = await axios.post("http://localhost:3000/api/povs", {
+        organisation,
+      });
       setCustomers(response.data);
     } catch (error) {
       console.error("Error fetching customers:", error);
+    }
+  };
+
+  const fetchTerritories = async () => {
+    try {
+      const organisation = localStorage.getItem("organization");
+      const response = await axios.post(
+        "http://localhost:3000/api/territories",
+        {
+          organisation,
+        }
+      );
+      setTerritories(response.data);
+    } catch (error) {
+      console.error("Error fetching territories:", error);
     }
   };
 
@@ -34,17 +56,23 @@ const CustomerManagement = () => {
   // Add a new customer
   const handleAddCustomer = async (e) => {
     e.preventDefault();
-    if (newCustomer.name && newCustomer.type) {
+    if (newCustomer.name && newCustomer.povType) {
       try {
         const response = await axios.post(
-          "https://mrappbackend.onrender.com/api/povs/count", // Correct POST endpoint for creating a customer
+          "http://localhost:3000/api/povs/createPOV", // Correct POST endpoint for creating a customer
           newCustomer,
           {
             headers: { "Content-Type": "application/json" },
           }
         );
         setCustomers([...customers, response.data]); // Add the new customer to the list
-        setNewCustomer({ name: "", type: "", contact: "", address: "" }); // Reset form
+        setNewCustomer({
+          name: "",
+          povType: "",
+          number: "",
+          address: "",
+          contactPerson: "",
+        }); // Reset form
       } catch (error) {
         console.error("Error adding customer:", error);
         if (error.response) {
@@ -54,6 +82,34 @@ const CustomerManagement = () => {
       }
     }
   };
+
+  const handleDeletePOV = async (id) => {
+    try {
+      await axios.delete(`http://localhost:3000/api/povs/${id}`);
+      setCustomers(customers.filter((customer) => customer._id !== id));
+    } catch (error) {
+      console.error("Error deleting POV:", error);
+    }
+  };
+
+  const handleTagTerritory = async (name, territory) => {
+    try {
+      const response = await axios.post(
+        "http://localhost:3000/api/povs/updateTaggedTerritory",
+        {
+          povName: name,
+          territoryName: territory,
+        },
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+      console.log("Territory tagged successfully:", response.data);
+      // Optionally, you can refresh the customer list or update the state here
+    } catch (error) {
+      console.error("Error tagging territory:", error);
+    }
+  }
 
   return (
     <div className="customer-management">
@@ -70,21 +126,21 @@ const CustomerManagement = () => {
           required
         />
         <select
-          name="type"
-          value={newCustomer.type}
+          name="povType"
+          value={newCustomer.povType}
           onChange={handleChange}
           required
         >
           <option value="">Select Type</option>
-          <option value="Hospital">Hospital</option>
+          <option value="Doctor">Doctor</option>
           <option value="Pharmacy">Pharmacy</option>
-          <option value="Diagnostic Lab">Diagnostic Lab</option>
+          <option value="Distributor">Distributor</option>
         </select>
         <input
           type="text"
-          name="contact"
+          name="number"
           placeholder="Contact Number"
-          value={newCustomer.contact}
+          value={newCustomer.number}
           onChange={handleChange}
         />
         <input
@@ -96,9 +152,9 @@ const CustomerManagement = () => {
         />
         <input
           type="text"
-          name="name"
+          name="contactPerson"
           placeholder="Contact person"
-          value={newCustomer.name}
+          value={newCustomer.contactPerson}
           onChange={handleChange}
           required
         />
@@ -119,12 +175,37 @@ const CustomerManagement = () => {
         <tbody>
           {customers.length > 0 ? (
             customers.map((cust) => (
-              <tr key={cust.id}>
-                <td>{cust.id}</td>
+              <tr key={cust._id}>
+                <td>{cust.povID}</td>
                 <td>{cust.name}</td>
-                <td>{cust.type}</td>
-                <td>{cust.contact}</td>
+                <td>{cust.povType}</td>
+                <td>{cust.number}</td>
                 <td>{cust.address}</td>
+                <td>
+                  <select
+                    value={cust.povType}
+                    onChange={(e) =>
+                      handleTagTerritory(cust.name, e.target.value)
+                    }
+                  >
+                    <option key="" value="">
+                      Select Territory
+                    </option>
+                    {territories.map((type) => (
+                      <option
+                        key={type.territoryName}
+                        value={type.territoryName}
+                      >
+                        {type.territoryName}
+                      </option>
+                    ))}
+                  </select>
+                </td>
+                <td>
+                  <button onClick={() => handleDeletePOV(cust._id)}>
+                    Delete
+                  </button>
+                </td>
               </tr>
             ))
           ) : (

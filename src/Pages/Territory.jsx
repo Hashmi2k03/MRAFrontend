@@ -8,14 +8,13 @@ const Territory = () => {
   const [newTerritoryName, setNewTerritoryName] = useState("");
 
   // Fetch territories from the API when the component mounts
-  useEffect(() => {
-    fetchTerritories();
-  }, []);
+  useEffect(() => { fetchTerritories(); }, []);
 
   // Fetch all territories
   const fetchTerritories = async () => {
     try {
-      const response = await axios.get('https://mrappbackend.onrender.com/api/territories');
+      const organisation = localStorage.getItem("organization");
+      const response = await axios.post('http://localhost:3000/api/territories', { organisation });
       setTerritories(response.data);
     } catch (error) {
       console.error('Error fetching territories:', error);
@@ -26,16 +25,15 @@ const Territory = () => {
   const handleAddTerritory = async () => {
     if (newTerritoryName.trim()) {
       try {
-        const newTerritory = {
-          territoryID: `TID${Date.now()}`,        // Auto-generated ID
-          territoryName: newTerritoryName,        // Name from input
-          territoryCode: "AUTO",                  // You can adjust this if needed
-          organisation: "DBS",                    // Default organisation
-          taggedUsers: []                         // Default empty
+        const organisation = localStorage.getItem("organization");
+        console.log("Organisation:", organisation); // for debugging
+        const newTerritory = {    
+          territoryName: newTerritoryName,
+          organisation: organisation   
         };
 
         const response = await axios.post(
-          'https://mrappbackend.onrender.com/api/territories',
+          'http://localhost:3000/api/territories/createTerritory',
           newTerritory,
           { headers: { 'Content-Type': 'application/json' } }
         );

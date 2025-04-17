@@ -1,0 +1,24 @@
+.awaiting-approval {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  text-align: center;
+  background-color: #f9f9f9;
+  color: #333;
+  font-family: Arial, sans-serif;
+}
+
+.awaiting-approval h1 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  color: #ff6b6b;
+}
+
+.awaiting-approval p {
+  font-size: 1.2rem;
+  color: #555;
+  max-width: 600px;
+  line-height: 1.5;
+}

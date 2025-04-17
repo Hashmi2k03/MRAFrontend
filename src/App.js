@@ -10,8 +10,9 @@ import Reports from "./Pages/Reports";
 import AdminDash from "./Pages/AdminDash";
 import TerEmp from "./Pages/TerEmp";
 import Pending from "./Pages/Pending";
-
 import "./App.css";
+import AwaitingApproval from "./Pages/AwaitingApproval";
+import LogVisit from "./Pages/LogVisit";
 
 function App() {
   return (
@@ -44,6 +45,8 @@ function AppRoutes() {
         <Route path="/AdminDash" element={<AdminDash />} />
         <Route path="/TerEmp" element={<TerEmp />} />
         <Route path="/pending" element={<Pending />} />
+        <Route path="/Unauthorised" element={<AwaitingApproval />} />
+        <Route path="/VisitLogs" element={<LogVisit />} />
       </Routes>
     </>
   );
